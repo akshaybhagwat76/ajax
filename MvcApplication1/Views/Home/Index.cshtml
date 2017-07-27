@@ -1,0 +1,251 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>AJAX OPERATION</title>
+    @*<script src="~/jquery-1.10.2.min.js"></script>*@
+
+    <script src="~/jquery-1.10.2.min.js"></script>
+    <link href="~/jquery-ui.css" rel="stylesheet" />
+    <script src="~/jquery-ui.js"></script>
+
+    @*//For load editable data*@
+    <script>
+
+        function ToJavaScriptDate(value) {
+            var pattern = /Date\(([^)]+)\)/;
+            var results = pattern.exec(value);
+            var dt = new Date(parseFloat(results[1]));
+            return (dt.getMonth() + 1) + "/" + dt.getDate() + "/" + dt.getFullYear();
+
+        }
+
+        function someFunction(id) {
+            $("#btnEdit").show();
+            $("#btn").hide();
+            $(document).ready(function () {
+                var pid = id;
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("editdata","Home")',
+                    data: { id: pid },
+                    dataType: "json",
+                    success: function (data) {
+                        //alert("success");
+                        $.each(data, function (ket, item) {
+
+                            //alert($("#hdn").val());
+                            //TextBox Section
+                            $("#hdn").val(item.id);
+                            $("#t1").val(item.name);
+                            $("#t3").val(item.desi);
+                            $("#t4").val(item.qua);
+                            $("#t6").val(item.email);
+                            $("#t7").val(item.mob);
+
+                            //Gender Secrtion
+                            var gen = String(item.sex);
+                            if (gen == $("#r1").val()) {
+                                $('input:radio[id=r1]').prop('checked', true);
+                                $('input:radio[id=r2]').prop('checked', false);
+                            }
+                            else {
+                                $('input:radio[id=r1]').prop('checked', false);
+                                $('input:radio[id=r2]').prop('checked', true);
+                            }
+
+                            //CheckBox Section
+                            var chk = String(item.isrelo);
+
+                            if (chk == $("#c1").val()) {
+                                $('input:checkbox[id=c1]').prop('checked', true);
+                                $('input:checkbox[id=c2]').prop('checked', false);
+                            }
+                            else {
+                                $('input:checkbox[id=c1]').prop('checked', false);
+                                $('input:checkbox[id=c2]').prop('checked', true);
+                            }
+
+
+                            //Dropdown section
+                            var drp = String(item.cntid);
+                            $("#drp").val(drp);
+
+                            //DatePicker
+                            var dt = String(ToJavaScriptDate(item.dob));
+
+                            $("#t2").val(dt);
+
+                        });
+                    },
+                });
+            });
+        }
+
+
+    </script>
+
+    @*inserting of data and retrieval*@
+    <script>
+        $(document).ready(function () {
+            $("#btnEdit").hide();
+            $(function () {
+                $("#t2").datepicker({
+                    changeMonth: true,
+                    changeYear: true
+
+                });
+            });
+
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("getdata","Home")',
+                dataType: "json",
+                success: function (data) {
+
+                    $.each(data, function (ket, item) {
+
+                        $("#f1").append("<tr><td>" + item.name + "</td><td>" + ToJavaScriptDate(item.dob) + "</td><td>" + item.desi + "</td><td>" + item.qua + "</td><td>" + item.sex + "</td><td>" + item.cname + "</td><td>" + item.email + "</td><td>" + item.isrelo + "</td><td>" + item.mob + "</td><td><a href='#' onclick='someFunction(" + item.id + ");' return false;'>EDIT</a></td><td><a href='/Home/del/" + item.id + "' onclick='return confirm('Are you sure?') return false;>DELETE</a></td></tr>")
+                    });
+                },
+            });
+            $("#btn").click(function () {
+                var chkval = $('input:checkbox[name=chk]:checked').val();
+                var drp = $("#drp1").val();
+                alert(drp);
+                //alert(chkval);
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("Index","Home")',
+                    data: { name: $("#t1").val(), dob: $("#t2").val(), desi: $("#t3").val(), qua: $("#t4").val(), rad: $("input[name=r1]:checked").val(), drp: $("#drp").val(), relo: $('input:checkbox[name=chk]:checked').val(), mob: $("#t7").val(), em: $("#t6").val() },
+                    dataType: "text",
+                    success: function (data) {
+                        alert(data);
+                        window.location.href = "/Home/Index/";
+                    },
+                });
+            });
+
+            $("#btnEdit").click(function () {
+
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("edit","Home")',
+                    datatype: "text",
+                    data: { empid: $("#hdn").val(), name: $("#t1").val(), dob: $("#t2").val(), desi: $("#t3").val(), qua: $("#t4").val(), rad: $("input[name=r1]:checked").val(), drp: $("#drp").val(), relo: $('input:checkbox[name=chk]:checked').val(), mob: $("#t7").val(), em: $("#t6").val() },
+                    success: function (data) {
+                        alert(data);
+                        window.location.href = "/Home/Index/";
+                    },
+                });
+            });
+        });
+    </script>
+
+
+</head>
+<body>
+    <div>
+
+        <center>
+            <h2>Registation</h2>
+            <table border="2">
+                <tr>
+                    <td>NAME</td>
+                    <td>
+                        <input type="hidden" id="hdn" value="" />
+                        <input id="t1" type="text" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>DATE</td>
+                    <td><input id="t2" class="datepicker" type="text" /></td>
+                </tr>
+                <tr>
+                    <td>DESIGNATION</td>
+                    <td><input id="t3" type="text" /></td>
+                </tr>
+                <tr>
+                    <td>QUALIFICATION</td>
+                    <td><input id="t4" type="text" /></td>
+                </tr>
+                <tr>
+                    <td>GENDER</td>
+                    <td>
+                        <input id="r1" type="radio" name="r1" value="MALE" />MALE
+                        <input id="r2" type="radio" name="r1" value="FEMALE" />FEMALE
+                    </td>
+                </tr>
+                <tr>
+                    <td>COUNTRY</td>
+                    <td>
+
+                        <select id="drp">
+                            <option>--SELECT--</option>
+                            <option>India</option>
+                            <option>Pakistan</option>
+                        </select>
+                        @*<select id="drp1">
+                                <option>--select--</option>
+                                @foreach (var item in ViewData["drp"] as List<MvcApplication1.Models.country>)
+                                {
+                                    <option value="@item.cntid">@item.cname</option>
+                                }
+                            </select>*@
+                    </td>
+                </tr>
+                <tr>
+                    <td>IS RELOCATE</td>
+                    <td>
+                        <input id="c1" type="checkbox" name="chk" value="yes" /> YES
+                        <input id="c2" type="checkbox" name="chk" value="no" /> NO
+                    </td>
+                </tr>
+                <tr>
+                    <td>EMAIL</td>
+                    <td><input id="t6" type="text" /></td>
+                </tr>
+
+                <tr>
+                    <td>MOBILE</td>
+                    <td><input id="t7" type="text" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="center">
+
+                        <input id="btn" type="button" value="SAVE" class="btn btn-success" />
+                        <input id="btnEdit" type="button" value="SAVE CHENGES" class="btn btn-success" />
+
+                    </td>
+                </tr>
+            </table>
+        </center>
+
+    </div>
+    <br />
+    <br />
+
+    <center>
+        <table id="f1" border="2">
+
+            <tr>
+                <td>Name</td>
+                <td>DOB</td>
+                <td>Designation</td>
+                <td>Qualification</td>
+                <td>Gender</td>
+                <td>Country</td>
+                <td>Email</td>
+                <td>IsRelocate</td>
+                <td>Mobile</td>
+            </tr>
+        </table>
+    </center>
+</body>
+</html>
