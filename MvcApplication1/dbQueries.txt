@@ -1,0 +1,14 @@
+CREATE TABLE [dbo].[employee] (
+    [id]     INT          IDENTITY (1, 1) NOT NULL,
+    [name]   VARCHAR (20) NULL,
+    [dob]    DATETIME     NULL,
+    [desi]   VARCHAR (50) NULL,
+    [qua]    VARCHAR (50) NULL,
+    [sex]    VARCHAR (50) NULL,
+    [cntid]  VARCHAR (10) NULL,
+    [email]  VARCHAR (50) NULL,
+    [isrelo] VARCHAR (50) NULL,
+    [mob]    VARCHAR (50) NULL,
+    CONSTRAINT [PK_emp] PRIMARY KEY CLUSTERED ([id] ASC)
+);
+
